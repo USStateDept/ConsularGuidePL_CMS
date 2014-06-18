@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load url from future %}
+
+{% block title %}{% trans "User management" %}{% endblock %}
+
+{% block wysiwyg_scripts %}
+    <script type="text/javascript" src="{% static "js/jquery.form.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/users.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">{% trans "User list" %}</h1>
+    <div class="table-responsive stick-bottom">
+    <table class="table table-full table-striped stick-bottom" id="users-table">
+    <thead>
+    <tr>
+        <th>{% trans "USERNAME" %}</th>
+        <th>{% trans "FIRST NAME" %}</th>
+        <th>{% trans "LAST NAME" %}</th>
+        <th colspan="3" class="action">{% trans "ACTIONS" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if user_list %}
+    {% for user_obj in user_list %}
+    <tr>
+        <td>{{ user_obj.username }}</td>
+        <td>{{ user_obj.first_name }}</td>
+        <td>{{ user_obj.last_name }}</td>
+        <td class="action">
+            <div class="modal fade user-password-modal" id="user-password-modal-{{user_obj.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+            </div>
+            <a href="{% url "admin-change-password" user_obj.id %}" data-toggle="modal" data-target="#user-password-modal-{{user_obj.id}}">
+                {% trans "PASSWORD" %}
+            </a>
+        </td>
+        <td class="action text-center">
+            <form method="post" action="{% url 'delete-user' %}" class="remove-form">
+            {% csrf_token %}
+            <input type="hidden" value="{{ user_obj.id }}" name="user_id">
+            <button role="submit" class="btn-action remove">
+                <img src="{% static 'img/remove.png' %}">  
+                {% trans "REMOVE" %}
+            </button>
+            </form>
+        </td>
+        <td class="action">
+
+            <div class="modal fade" id="user-edit-modal-{{user_obj.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+            </div>
+
+            <a href="{% url "edit-user" user_obj.id %}" data-toggle="modal" data-target="#user-edit-modal-{{user_obj.id}}">
+                <img src="{% static 'img/edit.png' %}">  
+                {% trans "EDIT" %}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="6" class="text-center">
+            <big>{% trans "No users found" %}</big>
+        </td>
+    </tr>
+    {% endif %}
+    </tbody>
+    </table>
+    </div>
+
+    {% include 'core/add_user.html' %}
+
+    <button data-toggle="modal" data-target="#user-add-modal" class="btn btn-lg btn-block">
+        <img src="{% static 'img/add.png' %}">
+        {% trans "Add user" %}
+    </button>
+
+{% endblock %}

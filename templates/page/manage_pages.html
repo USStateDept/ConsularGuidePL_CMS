@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load url from future %}
+
+{% block title %}{% endblock %}
+
+{% block header_styles %}
+<link rel="stylesheet" href="/static/css/content-tree.css">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4" id="left-panel">
+        {% include "page/content_tree.html" with widget_id='manage_pages' %}
+        <script type="text/javascript">
+        function pushAllItems(data)
+        {
+            var template = 
+                '<tr>' +
+                '   <td>{1}</td>' +
+                '   <td class="text-center">{2}</td>' +
+                '   <td>{3}</td>' +
+                '   <td class="action text-center item-remove">' +
+                '       <form action="{% url "delete-page" %}" method="post">' +
+                "       {% csrf_token %}" +
+                '       <input type="hidden" name="page_id" value="{0}">' +
+                '       <button role="submit" class="btn-action page-remove">' +
+                '       <img src="{% static 'img/remove.png' %}"> {% trans "REMOVE" %}' +
+                '       </button>' +
+                '       </form>' +
+                '   </td>' +
+                '   <td class="action item-edit">' +
+                '       <a href="/cms/edit_page/{0}/">' +
+                '           <img src="{% static 'img/edit.png' %}"> {% trans "EDIT" %}' +
+                '       </a>' +
+                '   </td>' +
+                '</tr>';
+
+            $item = $(template.format(
+                data.id,
+                data.title_en,
+                data.page_type_en,
+                data.parent_title_en
+            ));
+            
+            if(!data.can_edit)
+                $item.find('.item-edit').html('');
+
+            if(!data.can_remove)
+                $item.find('.item-remove').html('');
+
+            $('#page-table tbody').append($item);
+
+            for (var i = data.items.length - 1; i >= 0; i--) 
+            {
+                var item = data.items[i];
+                pushAllItems(item);
+            }
+        }
+        function dataCallback(data)
+        {
+            $('#page-table tbody').html('');
+            pushAllItems(data[0]);
+            $('#current-header').text(data[0].title_en + ' - ' + data[0].page_type_en);
+            $('#add-page-url').attr('href', '{% url "add-page" %}' + data[0].id);
+        }
+
+        $(function(){
+
+            $('#left-panel .content-tree').on('click', 'span.link', function(){
+                var $self = $(this);
+                var $self_arrow = $self.parent().find('span.arrow');
+                
+
+                if($self_arrow.data('loaded'))
+                {
+                    dataCallback($self_arrow.data('content'));
+                    return false;
+                }
+                $.get('{% url "page-content-tree" %}'+$self.data('id'), function(data){
+                     dataCallback(data);
+                });
+                return false;
+            });
+            
+            $('#page-table').on('click', '.page-remove', function(){
+                $self = $(this);
+                mconfirm(
+                    'Confirm page removal', 
+                    'Are you sure you want to remove this page? <br/>' +
+                    'Warning: Removing page will result in its child pages removal.',
+                    function(){
+                        $self.parent().submit();
+                    }
+                );
+
+                return false;
+            });
+        });
+        </script>
+    </div>
+    <div class="col-md-8">
+    <h2 id="current-header" class="text-center">{% trans "Main menu" %}</h2>
+    <div class="table-responsive">
+    <table class="table table-striped" id="page-table">
+    <thead>
+        <tr>
+            <th>TITLE</th><th>TYPE</th><th>PARENT TITLE</th><th colspan="2">ACTIONS</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% if tree %}
+    {% for page_obj in tree %}
+    <tr>
+        <td>{{ page_obj.title_en }}</td>
+        <td class="text-center">{{ page_obj.page_type_en }}</td>
+        <td>{{ page_obj.parent_title_en }}</td>
+        <td class="action text-center">
+        {% if page_obj.can_remove %}
+            <form action="{% url "delete-page"  %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="page_id" value="{{ page_obj.id }}">
+            <button role="submit" class="btn-action page-remove">
+                <img src="{% static 'img/remove.png' %}"> {% trans "REMOVE" %}
+            </button>
+            </form>
+        {% endif %}
+        </td>
+        <td class="action">
+        {% if page_obj.can_edit %}
+            <a href="{% url "edit-page" page_obj.id %}">
+                <img src="{% static 'img/edit.png' %}"> {% trans "EDIT" %}
+            </a>
+        {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+    </table>
+    </div>
+
+    <a href="{% url "add-page" %}" id="add-page-url" class="btn btn-lg btn-primary pull-right">{% trans "Add page" %}</a>
+    </div>
+</div>
+{% endblock %}

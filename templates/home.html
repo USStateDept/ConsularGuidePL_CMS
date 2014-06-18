@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}{% endblock %}
+
+
+{% block content %}
+    <br/> <a href="{% url "push" %}">Test push notifications</a>
+
+
+    {% if user.is_superuser %}
+    <br/><a href="{% url "manage-users" %}">{% trans "Manage users" %}</a>
+    {% endif %}
+
+    <br/><a href="{% url "video-list" %}">{% trans "Video list" %}</a>
+    <br/><a href="{% url "banner-update" %}">{% trans "Banner Update" %}</a>
+{% endblock %}

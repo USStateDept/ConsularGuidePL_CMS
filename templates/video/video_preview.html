@@ -1,0 +1,52 @@
+{% extends "modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}video-preview-modal{% endblock %}
+
+{% block dialog_class %}
+	in modal-visible
+{% endblock %}
+
+{% block dialog_action %}{% endblock %}
+
+{% block dialog_title %}Video preview{% endblock %}
+
+{% block dialog_body %}
+    {% if video.video_type == 'YT' %}
+        <iframe width="560" height="315" src="//www.youtube.com/embed/{{ video.get_yt_id }}?wmode=transparent" frameborder="0" allowfullscreen></iframe>
+    {% else %}
+        <video controls poster="{{ site }}{{ video.poster.url }}">
+            <source src="{{ site }}{{video.video_android1.url}}" type="video/mp4">
+        </video>
+    {% endif %}
+{% endblock %}
+
+{% block dialog_buttons %}
+    {% if video.video_type == 'LC' %}
+        <a href="{{ site }}{{ video.video_android1.url }}" class="btn btn-default">Direct link</a>
+    {% endif %}
+{% endblock %}
+
+
+{% block dialog_script %}
+<script type="text/javascript">
+$('#user-add-modal form').ajaxForm({
+    target:'#user-add-modal',
+    success: function(data)
+    {
+        if(data == '')
+        {
+            window.location.href = "{% url 'manage-users' %}";
+            return false;
+        }
+    }
+});
+
+$('.modal').on('hidden.bs.modal', function(){
+    if($(this).find('video').length > 0)
+        $(this).find('video')[0].pause();
+});
+</script>
+{% endblock %}

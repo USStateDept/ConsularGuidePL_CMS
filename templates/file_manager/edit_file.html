@@ -1,0 +1,51 @@
+{% extends "file_manager/add_file.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}file-edit-modal-{{ file.id }}{% endblock %}
+
+{% block dialog_class %}
+	in modal-visible
+{% endblock %}
+
+{% block dialog_action %}{% url 'edit-file' file.id %}{% endblock %}
+
+{% block dialog_title %}Add File{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Edit" %}
+</button>
+{% endblock %}
+
+{% block dialog_script %}
+<script type="text/javascript">
+    $dialog = $('#file-edit-modal-{{ file.id }}');
+    $dialog.find('form').ajaxForm({
+        target:'#file-edit-modal-{{ file.id }}',
+        beforeSend: function() 
+        {
+            if($dialog.find('#id_file_pl').val() != '' || $dialog.find('#id_file_en').val() != '')
+                $dialog.find('.upload-progress').removeClass('hidden');
+        },
+        uploadProgress: function(event, position, total, percentComplete) 
+        {
+            $dialog.find('.progress-bar').css('width', percentComplete + '%')
+            $dialog.find('.sr-only').html(percentComplete + '% Complete')
+        },
+        success: function(data)
+        {
+            if(data == 'OK')
+            {
+                window.location.href = "{% url 'files-home' %}";
+                return false;
+            }
+        },
+        error: function(data)
+        {
+            $dialog.find('.upload-error').removeClass('hidden');
+        }
+    });
+</script>
+{% endblock %}

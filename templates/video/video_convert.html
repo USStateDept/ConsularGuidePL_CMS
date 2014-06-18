@@ -1,0 +1,51 @@
+{% extends "modal.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}video-convert-modal{% endblock %}
+
+{% block dialog_class %}
+    in modal-visible
+{% endblock %}
+
+{% block dialog_action %}{% endblock %}
+
+{% block dialog_title %}{% trans "Choose thumbnail" %}{% endblock %}
+
+{% block dialog_body %}
+    {% if video.poster_1536 %}
+    <p>
+        <img id="video-thumb" src="{{ video.poster_1536.url }}"/>
+    <p>
+    {{ form.second }} 
+    {% trans "sec" %} 
+    <button id="get-thumb" class="btn btn-lg">
+        {% trans "Generate new" %}
+    </button> 
+
+    {% else %}
+        <p class="alert alert-danger">{% trans "Generate thumbnail error" %}.</p>
+    {% endif %}
+{% endblock %}
+
+{% block dialog_buttons %}
+    <a href="{% url 'video-convert-all' video.id %}" class="btn btn-primary">
+
+    {% if not video.active %}
+        {% trans "Start conversion" %}
+    {% else %}
+        {% trans "Save" %}
+    {% endif %}
+    </a>
+
+    {% if not video.active %}
+        <p class="dialog-button-info">{% trans "Click this button to start conversion for iOS and Android devices. This operation can takes few minutes" %}.</p>
+    {% endif %}
+{% endblock %}
+
+{% block dialog_script %}
+<script type="text/javascript">
+    video_id = {{video.id}}
+</script>
+<script src="/static/js/get_thumb.js" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block wysiwyg_scripts %}
+    <script type="text/javascript" src="{%  static "js/jquery.form.min.js" %}"></script>
+    <script type="text/javascript" src="{%  static "js/files.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">Files</h1>
+
+    <div class="table-responsive stick-bottom">
+    <table class="table table-striped table-full stick-bottom" id="file-table">
+        <thead class="noborder">
+            <tr>
+                <th class="column-id">{% trans 'ID' %}</th>
+                <th>{% trans 'NAME' %}</th>
+                <th>{% trans 'CREATED' %}</th>
+                <th colspan="3" class="action">{% trans 'ACTIONS' %}</th>
+        </thead>
+        <tbody>
+        {% if files %}
+            {% for file in files %}
+            <tr>
+                <td>{{ file.id }}</td>
+                <td>{{ file.name_en }}</td>
+                <td>{{ file.created }}</td>
+                <td class="action text-center">
+                    <form method="post" action="{% url "delete-file" %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="file_id" value="{{ file.id }}">
+                    <button role="submit" class="btn-action file-remove" >
+                        <img src="{% static 'img/remove.png' %}"> {% trans 'REMOVE' %}
+                </button>
+                    </form>
+                </td>
+                <td class="action">
+                    <div class="modal fade file-edit-modal" id="file-edit-modal-{{file.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                    </div>
+                    <a href="{% url "edit-file" file.id %}" data-toggle="modal" data-target="#file-edit-modal-{{file.id}}">
+                        <img src="{% static 'img/edit.png' %}">  
+                        {% trans "EDIT" %}
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center">{% trans "No files" %}</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    <table>
+    </div>
+
+    <button data-toggle="modal" data-target="#file-add-modal" class="btn btn-lg btn-block">
+        <img src="{% static 'img/add.png' %}">
+        {% trans "Add file" %}
+    </button>
+
+    {% include 'file_manager/add_file.html' %}
+{% endblock %}

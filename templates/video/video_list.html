@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% load static %}
+
+{% block wysiwyg_scripts %}
+    <script type="text/javascript" src="{%  static "js/jquery.form.min.js" %}"></script>
+    <script type="text/javascript" src="{%  static "js/videos.js" %}"></script>
+{% endblock %}
+
+{% block header_styles %}
+<link rel="stylesheet" href="/static/css/video.css">
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">Videos</h1>
+
+    <div class="table-responsive stick-bottom">
+    <table class="table table-striped table-full stick-bottom" id="video-table">
+        <thead class="noborder">
+            <tr>
+                <th class="column-id">{% trans 'ID' %}</th>
+                <th>{% trans 'TITLE' %}</th>
+                <th>{% trans 'TYPE' %}</th>
+                <th>{% trans 'CREATED' %}</th>
+                <th colspan="3">{% trans 'INFO' %}</th>
+        </thead>
+        <tbody>
+
+        {% if video_list %}
+        {% for video in video_list %}
+
+        {% if video.active or video.conversion or video.type == 'YT' %}
+        <tr>
+        {% else %}
+        <tr class="error">
+        {% endif %}
+
+            <td class="column-id">{{ video.id }}</td>
+            <td>{{ video.title_en }}/{{ video.title_pl }}</td>
+            <td>{{ video.video_type_name }}</td>
+            <td>{{ video.date }}</td>
+            {% if video.conversion %}
+            <td colspan="3">
+                Conversion in progress. Video will be available soon.
+            </td>
+            {% else %}
+            <td class="action">
+                <div class="modal fade" id="video-preview-modal-{{video.id}}" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+                {% if video.active or video.type == 'YT' %}
+                <a href="{% url 'video-preview' video.id %}" data-toggle="modal" data-target="#video-preview-modal-{{video.id}}">
+                    {% trans "PREVIEW" %}
+                </a>
+                {% else %}
+                    <div class="text-center">{% trans "ERROR" %}</div>
+                {% endif %}
+            </td>
+            <td class="action text-center">
+                <form method="post" action="{% url "video-delete" %}">
+                {% csrf_token %}
+                <input type="hidden" name="video_id" value="{{ video.id }}">
+                <button role="submit" class="btn-action video-remove" >
+                    <img src="{% static 'img/remove.png' %}"> {% trans 'REMOVE' %}
+            </button>
+                </form>
+            </td>
+            <td class="action">
+                <div class="modal fade video-edit-modal" id="video-edit-modal-{{video.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                </div>
+                <a href="{% url "video-edit" video.id %}" data-toggle="modal" data-target="#video-edit-modal-{{video.id}}">
+                    <img src="{% static 'img/edit.png' %}">  
+                    {% trans "EDIT" %}
+                </a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+
+    {% else %}
+        <tr>
+            <td colspan="6" class="text-center">{% trans "No videos" %}</td>
+        </tr>
+    {% endif %}    
+    </tbody>
+    </table>
+    </div>
+    
+    {% if convert_count == 0 %}
+        <button data-toggle="modal" data-target="#video-add-modal" class="btn btn-lg btn-block">
+            <img src="{% static 'img/add.png' %}">
+            {% trans "Add video" %}
+        </button>
+        {% include 'video/video_add.html' %}
+    {% else %}
+    <div data-original-title="Cannot add new videos - conversion in progress." class="hover-tooltip">
+        <button class="btn btn-lg btn-block disabled">
+            <img src="{% static 'img/add.png' %}">
+            {% trans "Add video" %}
+        </button>
+    </div>
+    {% endif %}
+{% endblock %}

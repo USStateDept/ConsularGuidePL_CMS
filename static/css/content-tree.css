@@ -1,0 +1,75 @@
+#left-panel 
+{
+	padding-top: 52px;
+}
+.content-tree-header
+{
+	background: #d9d9d9;
+	padding: 15px;
+	margin-bottom: 0;
+}
+
+.content-tree, .content-tree ul
+{
+	padding: 0;
+	width: 100%;
+}
+.content-tree li
+{
+	list-style-type: none;
+	background: #ebebeb;
+	border-top: solid 1px white;
+}
+.content-tree .trow
+{
+	display: table;
+	width: 100%;
+	padding: 0;
+}
+
+.content-tree .btn-sm
+{
+	padding: 2px 10px;
+}
+
+.content-tree li span
+{
+	padding: 15px;
+	display: block;
+	color: grey;
+	outline: none;
+}
+.content-tree span.open, .content-tree span.opened, .content-tree span.empty
+{
+	padding: 15px;
+	padding-left: 40px;
+	margin-left: 20px;
+	height: 100%;
+	cursor: pointer;
+	cursor: hand;
+}
+.content-tree span.open
+{
+	background: url('/static/img/tree_open.png') no-repeat left center;
+}
+
+.content-tree span.opened
+{
+	background: url('/static/img/tree_opened.png') no-repeat left center;
+}
+.content-tree span.empty
+{
+	background: none;
+}
+.content-tree li ul li span.arrow
+{
+	margin-left: 40px;
+}
+.content-tree li ul li ul li span.arrow
+{
+	margin-left: 70px;
+}
+.content-tree li ul li ul li ul li span.arrow
+{
+	margin-left: 100px;
+}

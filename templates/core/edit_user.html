@@ -1,0 +1,39 @@
+{% extends "core/add_user.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block dialog_id %}user-edit-modal{% endblock %}
+
+{% block dialog_class %}
+	in modal-visible user-edit-modal
+{% endblock %}
+
+{% block dialog_action %}{% url 'edit-user' user_object.id %}{% endblock %}
+
+{% block dialog_title %}
+    Edit user
+{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Save changes" %}
+</button>
+{% endblock %}
+
+
+{% block dialog_script %}
+<script type="text/javascript">
+checkboxChange();
+$('#user-edit-modal form').ajaxForm({
+    target:'#user-edit-modal',
+    success: function(data)
+    {
+        if(data == '')
+        {
+            window.location.href = "{% url 'manage-users' %}";
+            return false;
+        }
+    }
+});
+</script>
+{% endblock %}

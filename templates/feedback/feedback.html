@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load static %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block header_styles %}
+<link rel="stylesheet" href={% static "css/feedback.css"%}>
+<script type="text/javascript" src="{%  static "js/feedback.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Feedback</h1>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2" id="feedback-table">
+    {% for f in feedback %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <a href="#" class="feedback-remove pull-right" type="button" f_id="{{ f.id }}">
+                    <img src="{% static "img/remove.png" %}"> REMOVE
+                </a>
+                {% if f.email %}
+                    {{ f.email }}
+                {% else %}
+                    Anonymous user
+                {% endif %}
+                {% if f.from_page %}
+                    (page:
+                    {% if f.from_page.active %}
+                    <a href="{%  url 'edit-page' f.from_page.id %}">{{ f.from_page }}</a>)
+                    {% else %}
+                        Deleted)
+                    {% endif %}
+                {% else %}
+                    (Home screen)
+                {% endif %}
+                -
+                {{ f.date }}
+            </div>
+            <div class="panel-body">
+               {{ f.text|linebreaksbr }}
+            </div>
+        </div>
+    {% endfor %}
+
+        <ul class="pager">
+        {% if feedback.has_previous %}
+            <li class="previous">
+                <a href="?page={{ feedback.previous_page_number }}">&larr; Previous</a>
+            </li>
+        {% else %}
+            <li class="previous disabled">
+                <span>&larr; Previous</span>
+            </li>
+        {% endif %}
+            
+            <li class="current">
+                Page {{ feedback.number }} of {{ feedback.paginator.num_pages }}
+            </li>
+
+        {% if feedback.has_next %}
+            <li class="next">
+                <a href="?page={{ feedback.next_page_number }}">Next &rarr;</a>
+            </li>
+        {% else %}
+            <li class="next disabled">
+                <span>Next &rarr;</span>
+            </li>
+        {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

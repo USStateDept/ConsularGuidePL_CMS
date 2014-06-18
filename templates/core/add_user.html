@@ -1,0 +1,64 @@
+{% extends "modal.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block dialog_id %}user-add-modal{% endblock %}
+
+{% block dialog_class %}
+	{% if form.errors or edit %}
+	in modal-visible
+	{% endif %}
+{% endblock %}
+
+{% block dialog_action %}{% url 'add-user' %}{% endblock %}
+
+{% block dialog_title %}
+    Add user
+{% endblock %}
+
+{% block dialog_body %}
+	{% csrf_token %}
+    {% for field in form %}
+        <div class="form-group" id="{{ field.id_for_label }}_parent">
+        {{ field.label_tag }}
+        
+        {% if field.errors %}
+        <p class="alert alert-danger">
+            {% for error in field.errors %}
+                {{ error|escape }}
+            {% endfor %}
+        {% endif %}
+        
+        {{ field }}
+        
+        {% if field.help_text %}
+        <small>{{field.help_text}}</small>
+        {% endif %}
+        {% if field.errors %}
+        </p>
+        {% endif %}
+        </div>
+    {% endfor %}   
+{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Add user" %}
+</button>
+{% endblock %}
+
+{% block dialog_script %}
+<script type="text/javascript">
+$('#user-add-modal form').ajaxForm({
+    target:'#user-add-modal',
+    success: function(data)
+    {
+        if(data == '')
+        {
+            window.location.href = "{% url 'manage-users' %}";
+            return false;
+        }
+    }
+});
+</script>
+{% endblock %}

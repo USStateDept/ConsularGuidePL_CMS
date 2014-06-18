@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}Create an account{% endblock %}
+
+{% block content %}
+  <h1>Control panel for user: {{ edit_user }}</h1>
+
+    <br/><h1>Fields:</h1>
+  <form action="" method="post">{% csrf_token %}
+      {{ user_form.as_p }}
+  <input type="submit" name="change_fields" value="{% trans "Change data" %}">
+  </form>
+
+  <br/><h1>Password:</h1>
+    <form action="" method="post">{% csrf_token %}
+    {{ password_form.as_p }}
+    <input type="submit" name="change_password" value="{% trans "Change password" %}">
+    </form>
+
+{% endblock %}

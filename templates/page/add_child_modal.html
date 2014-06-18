@@ -1,0 +1,28 @@
+{% extends "modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}add-child-modal{% endblock %}
+
+
+{% block dialog_title %}Add child{% endblock %}
+
+{% block dialog_body %}
+<div class="text-center">
+    <a href="{% url "add-child-page" page.id %}" id="create-child-url" class="btn btn-lg">CREATE NEW</a>
+    <span class="select-existing">or select existing</span>
+    {% include 'page/content_tree.html' with tree=full_tree widget_id='add_child_modal' show_select=True %}
+    <script type="text/javascript">
+    $(function(){
+        $('#add-child-modal .content-tree').on('click', '.btn', function(){
+            var template = '<li id="child_{0}" data-id="{0}">{1}</li>';
+            var txt = template.format($(this).parent().data('id'), $(this).parent().directText());
+            $('#add-child-modal').modal('toggle');
+            $('#items-list').append(txt);
+            return false;
+        });
+    });
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load staticfiles %}
+{% load addclass %}
+
+{% block title %}Edit Page{% endblock %}
+
+{% block wysiwyg_scripts %}    
+
+    <script type="text/javascript" src="{% static "js/jquery.form.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/page.js" %}"></script>
+    {% if page %}
+    <script type="text/javascript">
+    page_id = {{ page.id }}
+    $(function(){
+        $('#form-content').on('change', '#id_page_type', function(){
+            $.get("{% url 'edit-page-partial' page.id %}", {page_type:$(this).val()}, function(result){
+                $('#page-edit-form').replaceWith(result);
+            });
+        });
+    });
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block header_styles %}
+<link rel="stylesheet" href="/static/css/page.css">
+<link rel="stylesheet" href="/static/css/content-tree.css">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4" id="left-panel">
+        <div class="row">
+            <div class="col-md-6">
+            {% if page.parent_page_id %}
+                <a href="{% url 'edit-page' page.parent_page_id %}" id="parent-link" class=" btn btn-primary btn-block">
+                <img src="/static/img/arrow_back.png"> {% trans "TO PARENT" %}
+            {% else %}
+                <a href="{% url 'page-home' %}" id="parent-link" class=" btn btn-primary btn-block">
+                <img src="/static/img/arrow_back.png"> {% trans "BACK" %}
+            {% endif %}
+            </a>
+            </div>
+        </div>
+
+        {% include "page/content_tree.html" with show_edit=True widget_id='edit_page' %}
+    </div>
+
+    <div class="col-md-8" id="form-content">
+    <h1 class="text-center">Edit Page</h1>
+    <div class="text-right clearfix" id="lang-switcher">
+        Language: 
+        <a href="" id="lang-switch-en" data-lang="en" class="lang-switch active">EN</a><a href="" id="lang-switch-pl" data-lang="pl" class="lang-switch">PL</a>
+    </div>
+    
+    {% include page_template %}
+    </div>
+
+    <div class="modal fade" id="add-page-modal" role="dialog" aria-hidden="true">
+    </div>
+
+</div>
+{% endblock %}

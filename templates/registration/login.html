@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block header_styles %}
+<link href="/static/css/full-form.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+	    <div class="col-md-8 col-md-offset-2">
+            <form class="full-form" role="form" action="{% url 'django.contrib.auth.views.login' %}" method="post">
+                {% block message %}
+                {% endblock message %}
+                {% csrf_token %}
+                <h2 class="form-signin-heading">Login to CMS</h2>
+
+                {% if form.errors %}
+                    <p class="alert alert-danger">Your username and password didn't match. Please try again.</p>
+                {% endif %}
+                <input type="text" class="form-control" placeholder="Login" name="username" required autofocus>
+                <input type="password" class="form-control" placeholder="Password" name="password" required>
+                <input type="hidden" name="next" value="{{ next }}" />
+                <p>
+                Forgot your password? Please contact the Administrator to reset.
+                </p>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">LOGIN</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+	    <div class="col-md-10 col-md-offset-1">
+            <h3>Warning</h3>
+            <p>
+                The use of this U.S. Government system is restricted to authorized users only. Unauthorized access, use, or
+                modification of this computer system or of the data contained herein or in transit to/from this system
+                constitutes a violation of Title 18, United States Code, Section 1030 and state criminal and civil laws. These
+                systems and equipment are subject to monitoring to ensure proper performance of applicable security features or
+                procedures. Such monitoring may result in the acquisition, recording and analysis of all data being
+                communicated, transmitted, processed or stored in this system by a user. If monitoring reveals possible
+                evidence of criminal activity, such evidence may be provided to law enforcement personnel.
+            </p>
+            <p>
+                ANYONE USING THIS SYSTEM EXPRESSLY CONSENTS TO SUCH.
+            </p>
+        </div>
+    </div>
+{% endblock %}

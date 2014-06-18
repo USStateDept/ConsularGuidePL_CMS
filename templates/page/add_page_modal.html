@@ -1,0 +1,70 @@
+{% extends "modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}add-page-modal{% endblock %}
+
+{% block dialog_class %}
+	in modal-visible
+{% endblock %}
+
+{% block dialog_title %}Add action page{% endblock %}
+
+{% block dialog_action %}{% url 'add-page-modal' page_id %}{% endblock %}
+
+{% block dialog_body %}
+    {% include 'form.html' %}
+{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Add page" %}
+</button>
+{% endblock %}
+
+{% block dialog_script %}
+<script type="text/javascript">
+$('#add-page-modal textarea').each(function(){
+    CKEDITOR.replace($(this)[0], {
+	    extraPlugins: 'btn',
+	    toolbar: [['Btn', 'h1', 'h2', 'Bold', 'NumberedList', 'BulletedList',  'Format' ]],
+	    allowedContent: 'p h1 h2[id]; ol ul li[id]; strong[id]; a(btn)[*];',
+	    on: {
+	        afterPaste: afterPasteFix,
+	        instanceReady: setupEvents,
+	        key: blockTab
+	    },
+	    contentsCss: [
+	        CKEDITOR.basePath + 'contents.css',
+	        '/static/css/contents_.css',
+	        '/static/css/contents_small.css',
+	    ],
+	    height: 150
+	});
+});
+
+$('#add-page-modal form').ajaxForm({
+    target:'#add-page-modal',
+    beforeSerialize: function()
+    {
+        for(var instanceName in CKEDITOR.instances)
+        {
+        	$('#add-page-modal').find('#'+instanceName).val(CKEDITOR.instances[instanceName].getData());
+        	console.log($('#add-page-modal').find('#'+instanceName))
+            console.log($('#add-page-modal').find('#'+instanceName).val())
+        }
+    },
+    success: function(data)
+    {
+        if(isNumber(data))
+        {
+            __global_element.setAttribute('data-page', data);
+            $('#add-page-modal').modal('hide');
+            $('#add-page-modal').data('bs.modal', null);
+            $('#add-page-modal').html('');
+        }
+    }
+});
+</script>
+{% endblock %}

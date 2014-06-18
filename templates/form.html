@@ -1,0 +1,17 @@
+{% csrf_token %}
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+{% for field in form.visible_fields %}
+    <div class="form-group" id="{{ field.id_for_label }}_parent">
+    {{ field.label_tag }}
+    {% if field.errors %}
+    <p class="alert alert-danger">
+        {% for error in field.errors %}
+            {{ error|escape }}
+        {% endfor %}
+    </p>
+    {% endif %}
+    {{ field }}
+    </div>
+{% endfor %}   

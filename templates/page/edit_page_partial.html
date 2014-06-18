@@ -1,0 +1,155 @@
+{% load i18n %}
+{% load url from future %}
+{% load staticfiles %}
+{% load addclass %}
+
+<script type="text/javascript">
+function afterPasteFix(e)
+{
+    ed = e.editor;
+    ed.widgets.checkWidgets();
+    selected = ed.getSelection().getStartElement();
+    selected.setAttribute('id', 'last-selected');
+    data = ed.getData();
+    $.post('/cms/clean_text/', { data: data }, function(cleaned_data) {
+        ed.setData(cleaned_data);
+    });
+}
+
+function setupEvents(e)
+{
+    e.editor.on('toHtml', function(evt) {
+        ed = evt.editor;
+        selected = ed.document.getById('last-selected');
+        if (selected != null) {
+            selected.removeAttribute('id');
+            range = ed.createRange();
+            range.selectNodeContents(selected);
+            range.collapse();
+            ed.getSelection().selectRanges([range]);
+            selected.scrollIntoView();
+        }
+    }, null, null, 20 );
+}
+
+function blockTab(e)
+{
+    var key = e.data.keyCode;
+    if (key==9) {
+        return false;
+    }
+}
+</script>
+
+<form action="" method="post" role="form" id="page-edit-form">
+    {% csrf_token %}
+    {% if form.errors %}
+        <p class="alert alert-danger"> {% trans "Please fix form errors."%}
+        </p>
+    {% endif %}
+    {% if saved %}
+        <p class="alert alert-success" id="page-saved-msg">
+            {% trans "Page saved." %}
+        </p>
+    {% endif %}
+    {% if form.non_field_errors or children_error %}
+        <p class="alert alert-danger">
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    {{ error|escape }}
+                {% endfor %}
+            {% endif %}
+            {% if children_error %}
+                {{ children_error|escape }}
+            {% endif %}
+        </p>
+    {% endif %}
+    {% for field in form.hidden_fields %}
+        {{ field }}        
+    {% endfor %}
+    {% for field in form.visible_fields %}
+        <div class="form-group">
+        {{ field.label_tag }}
+        
+        {% if field.errors %}
+        <p class="alert alert-danger">
+            {% for error in field.errors %}
+                {{ error|escape }}
+            {% endfor %}
+        </p>
+        {% endif %}
+        {{ field }}
+        </div>
+    {% endfor %}
+
+    {% block children %}
+    {% endblock %}
+
+    <button type="submit" class="btn btn-lg btn-block" id="save-button">
+        <img src="/static/img/save.png"> SAVE CHANGES
+    </button>
+
+</form>
+<script type="text/javascript">
+    
+    $(function(){
+        $('.lang-pl').parent().hide();
+    });
+
+    $('.lang-switch').click(function(){
+        $('.lang-switch').removeClass('active');
+        $(this).addClass('active');
+        var lang = $(this).data('lang');
+        var prev_lang = (lang == 'en' ? 'pl' : 'en');
+        $('.lang-'+lang).parent().show();
+        $('.lang-'+prev_lang).parent().hide();
+        return false;
+    });
+
+    $('#page-edit-form').click(function() {
+       $('#page-saved-msg').hide();
+    });
+
+
+    delete CKEDITOR.dtd.p.img;
+    CKEDITOR.dtd.$block.img = 1;
+
+    $('#page-edit-form textarea[name^="content"]').map(function(i, e) {
+        CKEDITOR.replace(e, {
+        {% if page.page_type == 'cate' %}
+            extraPlugins: 'phone,hours,address,mail,btn,info,categories,ajax,xml',
+            toolbar: [
+                ['Phone', 'Hours', 'Address', 'Contact', 'Mail', 'Btn', 'Info', 'Categories'],
+                '/',
+                ['h1', 'h2', 'Bold', 'NumberedList', 'BulletedList', 'Image', 'Format']
+            ],
+        {% endif %}
+            on: {
+                afterPaste: afterPasteFix,
+                instanceReady: setupEvents,
+                key: blockTab
+            }
+        });
+    });
+    $('#page-edit-form textarea[name^="additional"]').map(function(i, e) {
+        CKEDITOR.replace(e, {
+            extraPlugins: 'btn,xml,ajax',
+            toolbar: [['Btn', 'h1', 'h2', 'Bold', 'NumberedList', 'BulletedList',  'Format' ]],
+            allowedContent: 'p h1 h2[id]; ol ul li[id]; strong[id]; a(btn)[*];',
+            on: {
+                afterPaste: afterPasteFix,
+                instanceReady: setupEvents,
+                key: blockTab
+            },
+            contentsCss: [
+                CKEDITOR.basePath + 'contents.css',
+                '/static/css/contents_.css',
+                '/static/css/contents_small.css',
+            ]
+        });
+    });
+    
+    $('select.form-control').selectpicker({
+        style: 'btn-lg'
+    });
+</script>

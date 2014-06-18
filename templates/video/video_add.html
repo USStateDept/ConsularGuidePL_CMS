@@ -1,0 +1,77 @@
+{% extends "modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}video-add-modal{% endblock %}
+
+{% block dialog_class %}
+	{% if form.errors %}
+	in modal-visible
+	{% endif %}
+{% endblock %}
+
+{% block dialog_action %}{% url 'video-add' %}{% endblock %}
+
+{% block dialog_title %}Add Video{% endblock %}
+
+{% block dialog_body %}
+    {{ block.super }}
+    <div class="upload-progress hidden">
+        Uploading video:
+        <div class="progress progress-striped active">
+            <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            <span class="sr-only">0% Complete</span>
+        </div>
+        </div>
+    </div>
+    <div class="alert alert-danger hidden upload-error">Could not upload files. Please try again later.</div>
+{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Add" %}
+</button>
+{% endblock %}
+
+{% block dialog_script %}
+<script type="text/javascript">
+    if ($('#id_video_type').val() == 'YT')
+    {
+        $('#id_video_original_parent').hide();
+        $('#id_url_parent').show();
+    }
+    else 
+    {
+        $('#id_video_original_parent').show();
+        $('#id_url_parent').hide();
+    }
+    
+    $dialog = $('#video-add-modal');
+    $dialog.find('form').ajaxForm({
+        target:'#video-add-modal',
+        beforeSend: function() 
+        {
+            if($dialog.find('#id_video_original').val() != '')
+                $dialog.find('.upload-progress').removeClass('hidden');
+        },
+        uploadProgress: function(event, position, total, percentComplete) 
+        {
+            $dialog.find('.progress-bar').css('width', percentComplete + '%')
+            $dialog.find('.sr-only').html(percentComplete + '% Complete')
+        },
+        success: function(data)
+        {
+            if(data == '')
+            {
+                window.location.href = "{% url 'video-list' %}";
+                return false;
+            }
+        },
+        error: function(data)
+        {
+            $dialog.find('.upload-error').removeClass('hidden');
+        }
+    });
+</script>
+{% endblock %}

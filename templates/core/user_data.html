@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}Create an account{% endblock %}
+
+{% block header_styles %}
+<link href="/static/css/full-form.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <form action="" method="post" class="full-form">{% csrf_token %}
+	<h1 class="text-center">Your account</h1>
+	{% include 'form.html' %}
+	<div class="form-group">
+        {% trans "Raw passwords are not stored, so there is no way to see this user's password, but you can change the password using" %}
+        <a href="{% url 'user-password' %}">{% trans 'this form' %}</a>.
+    </div>
+
+      <button role="submit" class="btn btn-primary btn-lg btn-block">SAVE CHANGES</button>
+  </form>
+{% endblock %}

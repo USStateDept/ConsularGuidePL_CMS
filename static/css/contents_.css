@@ -1,0 +1,105 @@
+body
+{
+    width: 615px !important;
+    margin: 20px;
+    font: "Times New Roman";
+}
+
+.phone > .row, .hours > .row, .mail > .row
+{
+    margin-left: 30px;
+}
+
+.shortinfo, .longinfo
+{
+    border: 2px solid #ffd130;
+}
+
+.shortinfo 
+{
+    padding-right: 30px;
+}
+.longinfo
+{
+    background: #ffffef;
+}
+.btn
+{
+    padding: 8px;
+    background: rgb(28,52,103);
+    color: #ffffff;
+    padding: 10px;
+    font-size: 16px;
+    display: block;
+}
+
+.btn:after
+{
+    content: ">";
+    float: right;
+    font-size: 30px;
+    font-family: Tahoma;
+}
+
+.row, .name, .cname, .ctext, .shortinfo, .longinfo
+{
+    padding: 0 8px;
+}
+
+.name, .cname
+{
+    font-weight:bold;
+}
+.citem
+{
+    display: inline-block;
+    width:48%;
+    padding: 1px;
+    vertical-align: top;
+}
+.cname
+{
+    text-align:center;
+    float:left;
+    width: 50px;
+    min-height: 20px;
+    background-color: #ececec;
+    word-wrap: break-word;
+    padding: 15px 0;
+}
+
+.ctext{
+    float:left;
+    width:70%;
+}
+
+.phone
+{
+    background:#ffffff url('/static/ckeditor/plugins/phone/icons/phone.png') no-repeat left center;
+}
+
+.hours
+{
+    background:#ffffff url('/static/ckeditor/plugins/hours/icons/hours.png') no-repeat left center;
+}
+
+.mail
+{
+    background:#ffffff url('/static/ckeditor/plugins/address/icons/address.png') no-repeat left center;
+}
+
+.phone, .mail, .hours
+{
+    min-height: 40px;
+}
+
+.shortinfo
+{
+    background:rgb(255,247,207) url('/static/ckeditor/plugins/info/icons/info.png') no-repeat right 10px center;
+}
+
+.cke_widget_wrapper
+{
+    margin-top: 12px;
+    margin-bottom: 12px;
+}

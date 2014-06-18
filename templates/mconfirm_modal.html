@@ -1,0 +1,23 @@
+{% extends "modal.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}mconfirm-modal{% endblock %}
+
+{% block dialog_class %}
+{% endblock %}
+
+{% block dialog_action %}{% endblock %}
+
+{% block dialog_title %}Are you sure?{% endblock %}
+
+{% block dialog_body %}
+Message content
+{% endblock %}
+
+{% block dialog_buttons %}
+<button type="button" class="btn btn-primary" >
+	Confirm
+</button>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% load static %}
+
+<h4 class="content-tree-header text-center">
+	CONTENT TREE <img src="{% static 'img/tree_opened.png' %}">
+</h4>
+<ul class="content-tree" id="{{ widget_id }}">
+{% for item in tree %}
+<li>
+	<span class="trow">
+		<span class="{% if item.items_count > 0 %}open{% else %}empty{% endif %} arrow link" data-id="{{ item.id }}">
+			{{ item.title_en }}
+			{% if show_edit %}
+				<a href="/cms/edit_page/{{ item.id }}/" class="btn btn-default btn-sm pull-right">EDIT</a>
+			{% elif show_select %}
+				<a href="#" class="btn btn-default btn-sm pull-right">SELECT</a>
+			{% endif %}
+		</span>
+	</span>
+	<ul>
+	</ul>
+</li>
+{% endfor %}
+</ul>
+
+<script type="text/javascript">
+if (!String.prototype.format) {
+  String.prototype.format = function() {
+
+    var args = arguments;
+    var sprintfRegex = /\{(\d+)\}/g;
+
+    var sprintf = function (match, number) {
+      return number in args ? args[number] : match;
+    };
+
+    return this.replace(sprintfRegex, sprintf);
+  };
+}
+
+$(function(){
+	$('#{{ widget_id }}.content-tree').on('click', 'a', function(e){
+		e.stopPropagation();
+	});
+	$('#{{ widget_id }}.content-tree').off('click', 'span.arrow').on('click', 'span.arrow', function(e){
+		var $self = $(this);
+		var $content = $self.closest('li').children('ul');
+		if($self.hasClass('open'))
+		{
+			$content.slideUp();
+		}			
+		if($self.data('loaded'))
+		{
+			$content.slideDown();
+			$(this).removeClass('open');
+			$(this).addClass('opened');
+			return false;
+		}
+
+		var page_id = $self.data('id');
+		$.get('{% url "page-content-tree" %}'+page_id, function(data){
+			var $content = $self.closest('li').children('ul');
+			var template = 
+				'<li>' +
+				'	<span class="trow">' +
+				'		<span class="open arrow link" data-id="{0}">' +
+				'			{1} ' +
+			{% if show_edit %}
+				' 			<a href="/cms/edit_page/{0}/" class="btn btn-default btn-sm pull-right">EDIT</a>' +
+			{% elif show_select %}
+				' 			<a href="#" class="btn btn-default btn-sm pull-right">SELECT</a>' +
+			{% endif %}
+				'		</span>' +
+				'	</span>' +
+				'	<ul></ul>' +
+				'</li>';
+
+			if(data[0].items.length == 0)
+			{
+				$self.addClass('empty');
+				$self.removeClass('open');
+				$self.removeClass('opened');
+			}
+			else
+			{
+				$.each(data[0].items, function( index, value ) {
+					var html = template.format(value.id, value.title_en);
+					var $html = $(html);
+					if(value.items_count == 0)
+						$html.find('.trow span').removeClass('open').addClass('empty');
+					$content.append($html);
+				});
+				$content.slideDown();
+			}
+			$self.data('loaded', true);
+			$self.data('content', data);
+			if($self.hasClass('arrow'))
+			{
+				$self.removeClass('open');
+				$self.addClass('opened');
+			}
+			e.preventDefault();
+		});
+		e.preventDefault();
+	});
+
+	$('#{{ widget_id }}.content-tree').off('click', 'span.opened').on('click', 'span.opened', function(e){
+		var $content = $(this).closest('li').children('ul');
+		$content.slideUp();
+		$(this).removeClass('opened');
+		$(this).addClass('open');
+		e.preventDefault();
+	});
+});
+</script>

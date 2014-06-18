@@ -1,0 +1,9 @@
+.idea
+.venv
+sqlite.db
+settings_local.py
+*.pyc
+media
+tmp
+celerybeat-schedule
+static_collected

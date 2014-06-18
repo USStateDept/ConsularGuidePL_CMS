@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load url from future %}
+
+{% block title %}Push notifications{% endblock %}
+
+{% block additional_scripts %}
+<script type="text/javascript">
+$(function(){
+	$('#update-button').click(function(){
+		mconfirm(
+			'Confirm sending update notification', 
+			'Update notification is a silent push notification that tell the application that the content has been changed significantly and that on the next connection to the server it should reload ALL the content. This should be used only in extreme cases.',
+			function(){
+				window.location.href = "{% url 'push-all' %}";
+			}
+		);
+		return false;
+	});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		{% if message %}
+			<div class="alert alert-success">{{ message }}</div>
+		{% endif %}
+
+	    <h1 class="text-center">Push notifications</h1>
+	    
+	    <form method="POST" action="{% url 'push' %}" enctype="multipart/form-data">
+	    {% include 'form.html' %}
+	    <button role="submit" class="btn btn-lg btn-block">
+	    <img src="{% static 'img/update.png' %}">{% trans 'SEND' %}
+		</button>
+	    </form>
+	</div>
+    <div class="text-center col-md-8 col-md-offset-2">
+	    <h1 class="text-center">Update notification</h1>
+		<a href="{% url "push-all" %}" class="btn btn-lg btn-block" id="update-button">
+			Send update notification
+		</a>
+	</div>
+</div>
+{% endblock %}

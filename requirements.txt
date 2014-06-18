@@ -1,0 +1,22 @@
+ipython
+sh
+pytz==2013.9
+Pillow
+librabbitmq
+Celery
+Django<1.6
+South==0.8.3
+django-appconf
+django-extensions
+django-model-utils
+django-staticfiles
+django-uuidfield
+django-imagekit
+django-celery-email
+lxml
+feedparser
+cssselect
+apns-client
+mysql-python
+raven
+-e git+https://github.com/Agitive/django-push-notifications.git@master#egg=django-push-notifications

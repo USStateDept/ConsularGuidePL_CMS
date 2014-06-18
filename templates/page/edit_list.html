@@ -1,0 +1,32 @@
+{% extends "page/edit_page_partial.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load staticfiles %}
+
+{% block children %}
+<div class="form-group">
+    <label>Children:</label>
+    <ul class="sortable stick-bottom" id="items-list">
+    {% for child in children %}
+        <li id="child_{{ child.id }}" data-id="{{ child.id }}">{{ child.title_en }}</li>
+    {% endfor %}
+    </ul>
+    
+    {% include 'page/add_child_modal.html' with no_form=True %}
+
+    <div class="btn-group" id="children-menu">
+        <a data-toggle="modal" data-target="#add-child-modal" class="btn btn-lg">
+            <img src="{% static 'img/add.png' %}">
+            {% trans "NEW" %}
+        </a>
+
+        <ul id="remove-item" title="Drag item here to remove it" class="hover-tooltip">
+            <img src="{% static 'img/remove.png' %}">
+            {% trans "REMOVE" %}
+        </ul>
+    </div>
+    <script type="text/javascript">
+    installSortables();
+    </script>
+</div>
+{% endblock %}

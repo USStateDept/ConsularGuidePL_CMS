@@ -1,0 +1,74 @@
+{% extends "video/video_add.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block dialog_id %}video-edit-modal{% endblock %}
+
+{% block dialog_class %}
+    in modal-visible
+{% endblock %}
+
+{% block dialog_action %}{% url 'video-edit' video.id %}{% endblock %}
+
+{% block dialog_title %}Edit Video{% endblock %}
+
+{% block dialog_buttons %}
+<button type="submit" class="btn btn-primary">
+	{% trans "Edit" %}
+</button>
+{% if video.is_local %}
+	<button class="btn pull-left thumb-edit">
+	    {% trans "Edit thumbnail" %}
+	</button>
+{% endif %}
+{% endblock %}
+
+
+{% block dialog_script %}
+<script type="text/javascript">
+    if ($('#id_video_type').val() == 'YT')
+    {
+        $('#id_video_original_parent').hide();
+        $('#id_url_parent').show();
+    }
+    else 
+    {
+        $('#id_video_original_parent').show();
+        $('#id_url_parent').hide();
+    }
+    
+    $dialog = $('#video-edit-modal-{{video.id}}');
+	$dialog.find('.thumb-edit').click(function(){
+		$.get('{% url 'video-convert' video.id %}', function(data){
+			$dialog.html(data);
+		});
+		return false;
+	});    
+    $dialog.find('form').ajaxForm({
+        target:'#video-edit-modal-{{video.id}}',
+        beforeSend: function() 
+        {
+            if($dialog.find('#id_video_original').val() != '')
+                $dialog.find('.upload-progress').removeClass('hidden');
+        },
+        uploadProgress: function(event, position, total, percentComplete) 
+        {
+            $dialog.find('.progress-bar').css('width', percentComplete + '%')
+            $dialog.find('.sr-only').html(percentComplete + '% Complete')
+        },
+        success: function(data)
+        {
+            if(data == '')
+            {
+                window.location.href = "{% url 'video-list' %}";
+                return false;
+            }
+        },
+        error: function(data)
+        {
+            $dialog.find('.upload-error').removeClass('hidden');
+        }
+    });
+</script>
+{% endblock %}

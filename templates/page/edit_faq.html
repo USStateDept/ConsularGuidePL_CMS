@@ -1,0 +1,105 @@
+{% extends "page/edit_page_partial.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load staticfiles %}
+
+{% block children %}
+<div class="form-group">    
+    <label class="lang-en">Frequently asked questions (EN)</label>
+    <div id="faq-en" class="faq">
+    <button class="add-question btn btn-lg btn-block">
+        <img src="{% static "img/add.png" %}"> Add question
+    </button>
+    </div>
+</div>
+<div class="form-group">    
+    <label class="lang-pl">Frequently asked questions (PL)</label>
+    <div id="faq-pl" class="faq">
+    <button class="add-question btn btn-lg btn-block">
+        <img src="{% static "img/add.png" %}"> Add question
+    </button>
+    </div>
+</div>
+<script type="text/javascript">
+$(function(){
+    showFAQs('en');
+    showFAQs('pl');
+    $('#save-button').click(function() {
+        for(var instanceName in CKEDITOR.instances)
+            CKEDITOR.instances[instanceName].updateElement();
+
+        saveFAQs('en');
+        saveFAQs('pl');
+    });
+    $('.add-question').click(function() {
+        question = $('<div class="question">' +
+                '<textarea placeholder="Question" class="question"></textarea>' +
+                '<button class="remove-question"></button>' +
+                '<textarea placeholder="Answer" class="answer"></textarea>' +
+                '</div>');
+        question.insertBefore($(this));
+        $txtarea = question.find('.answer');
+        installEditor($txtarea[0]);
+        return false;
+    });
+
+});
+
+function installEditor(element)
+{
+    CKEDITOR.replace(element, {
+        extraPlugins: 'phone,hours,address,mail,btn,ajax,xml',
+        toolbar: [['Phone', 'Hours', 'Address', 'Contact', 'Mail', 'Btn', 'Bold', 'NumberedList', 'BulletedList']],
+        allowedContent: 'div(*)[*]; p[id]; ol ul li[id]; strong[id]; a(btn)[*];',
+        contentsCss: [
+            CKEDITOR.basePath + 'contents.css',
+            '/static/css/contents_.css'
+        ],
+        on: {
+            afterPaste: afterPasteFix,
+            instanceReady: setupEvents,
+            key: blockTab
+        }
+    });
+}
+
+function showFAQs(lang) 
+{
+    json = $('#id_content_' + lang).val();
+    console.log(json);
+    if (!json) {
+        json = '[]';
+    }
+    try
+    {
+        obj = JSON.parse(json);
+    }
+    catch (e)
+    {
+        obj = new Array();
+    }
+
+    len = obj.length;
+    for(i = 0; i< len; ++i) {
+        question = $('<div class="question"></div>');
+        question.append('<textarea placeholder="Question" class="question">' + obj[i].question + '</textarea>');
+        question.append('<button class="remove-question"></button>');
+        question.append('<textarea placeholder="Answer" class="answer">' + obj[i].answer + '</textarea>');
+        question.insertBefore($('#faq-' + lang + ' > .add-question'));
+
+        $txtarea = question.find('.answer');
+        installEditor($txtarea[0]);
+    }
+
+};
+function saveFAQs(lang) {    
+    faqs = $('#faq-' + lang + ' > .question').map(function(i, e) {
+        obj = new Object();
+        obj.question = e.children[0].value;
+        obj.answer = e.children[2].value;
+        return obj;
+    }).get();
+    $('#id_content_' + lang).val(JSON.stringify(faqs));
+};
+</script>
+{% endblock %}

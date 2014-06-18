@@ -1,0 +1,44 @@
+<div class="modal fade {% block dialog_class %}{% endblock %}" id="{% block dialog_id %}{% endblock %}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        {% if not no_form %}
+        <form method="POST" action="{% block dialog_action %}{% endblock %}" enctype="multipart/form-data">
+        {% endif %}
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h2 class="modal-title">
+                    {%block dialog_title %}{% endblock %}
+                </h2>
+            </div>
+            <div class="modal-body">
+                {% block dialog_body %}
+                    {% include 'form.html' %}
+                {% endblock %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Cancel
+                </button>
+                {% block dialog_buttons %}
+                {% endblock %}
+            </div>
+        {% if not no_form %}
+        </form>
+        {% endif %}
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+    <script type="text/javascript">
+    $('select.form-control').each(function(){
+        if($(this).is(':visible'))
+        {
+            $(this).selectpicker({
+                style: 'btn-lg'
+            });
+        }
+    });
+    </script>
+    {% block dialog_script %}
+    {% endblock %}
+</div><!-- /.modal -->

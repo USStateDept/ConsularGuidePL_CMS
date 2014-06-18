@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+    <h1 class="text-center">Banners</h1>
+    <form method="POST" action="" enctype="multipart/form-data" id="banner-form">
+    {% include 'form.html' %}
+    <button class="btn btn-lg btn-block" role="submit">
+    	<img src="{% static 'img/update.png' %}">
+        {% if object.enabled %}
+            {% trans "UPDATE BANNER" %}
+        {% else %}
+            {% trans "ENABLE BANNER" %}
+        {% endif %}
+    </button>
+    </form>
+    {% if object.enabled %}
+        <br/>
+        <form method="POST" action="{% url 'banner-disable' %}" id="banner-form-disable">
+            {% csrf_token %}
+            <button class="btn btn-lg btn-block" role="submit">
+                <img src="{% static 'img/remove.png' %}"> {% trans "DISABLE BANNER" %}
+            </button>
+        </form>
+    {% endif %}
+    <script type="text/javascript">
+    $(function(){
+        var banner_confirm = false;
+    	$('#banner-form').submit(function(e){
+    		var type = $(this).find('select').val();
+            if(!banner_confirm && type === 'emergency')
+            {
+                mconfirm('Push notification', 'This action will result in sending push notification to all devices. Are you sure?', function(){
+                    $('#banner-form').submit();
+                }, function(){
+                    banner_confirm = false;
+                });
+                banner_confirm = true;
+                e.preventDefault();
+            }
+    	});
+    });
+    </script>
+    </div>
+</div>
+{% endblock %}

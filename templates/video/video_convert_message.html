@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{% autoescape off %}{{ message }}{% endautoescape %}</h2><br/>
+    <a href="{% url 'video-list' %}">{% trans "Go back to video list" %}</a>
+{% endblock %}
